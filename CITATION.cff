@@ -1,0 +1,26 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite the associated AI Open paper."
+title: "Privacy-Preserving Bodily Emotion Recognition: Public DT-KD Reference Implementation"
+type: software
+authors:
+  - family-names: Wu
+    given-names: Shuang
+  - family-names: Romano
+    given-names: Daniela M.
+repository-code: "https://github.com/296466042Shuang/dual-teacher-emotion-recognition"
+url: "https://doi.org/10.1016/j.aiopen.2026.08.001"
+preferred-citation:
+  type: article
+  authors:
+    - family-names: Wu
+      given-names: Shuang
+    - family-names: Romano
+      given-names: Daniela M.
+  title: "Privacy-preserving in-the-wild bodily expressed emotion recognition: A dual-teacher distillation framework with psychological priors"
+  journal: "AI Open"
+  volume: 7
+  pages:
+    start: 248
+    end: 275
+  year: 2026
+  doi: "10.1016/j.aiopen.2026.08.001"
