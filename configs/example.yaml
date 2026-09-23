@@ -1,0 +1,28 @@
+seed: 42
+
+data:
+  num_joints: 17
+  clip_length: 60
+  lma_dim: 33
+  num_fine_classes: 26
+  num_coarse_classes: 7
+
+student:
+  feature_dim: 96
+
+teachers:
+  feature_dim: 128
+
+distillation:
+  temperature: 2.0
+  alpha_kd: 1.0
+  alpha_coarse: 0.25
+  alpha_feature: 0.10
+  alpha_proto: 0.05
+
+optim:
+  lr: 0.0003
+  weight_decay: 0.0001
+
+# This is a compact public reference configuration, not the exact configuration
+# used to produce the paper's reported results.
