@@ -1,6 +1,7 @@
 # Privacy-Preserving Bodily Emotion Recognition
 
 [![Paper](https://img.shields.io/badge/AI%20Open-2026-blue)](https://doi.org/10.1016/j.aiopen.2026.08.001)
+[![smoke-test](https://github.com/296466042Shuang/dual-teacher-emotion-recognition/actions/workflows/smoke-test.yml/badge.svg)](https://github.com/296466042Shuang/dual-teacher-emotion-recognition/actions/workflows/smoke-test.yml)
 ![Python](https://img.shields.io/badge/Python-3.10%2B-blue)
 ![PyTorch](https://img.shields.io/badge/PyTorch-reference%20implementation-orange)
 
@@ -222,6 +223,16 @@ If this repository or the associated paper is useful in your work, please cite:
 ```
 
 Machine-readable citation metadata are also provided in `CITATION.cff`.
+
+## Model card
+
+A compact model card covering intended use, inputs, limitations, privacy considerations, and out-of-scope use is provided in [MODEL_CARD.md](MODEL_CARD.md).
+
+## Broader sensing perspective
+
+Although the application here is bodily affect recognition, the underlying learning problem is more general: a target latent signal must be recovered from observations that are incomplete, noisy, and mixed with nuisance variation. The design therefore emphasises privileged supervision, modality alignment, confidence-aware distillation, and a constrained deployment interface.
+
+This perspective is relevant to other sensing problems in which the information available during training is richer than the information available at deployment.
 
 ## Research context
 
