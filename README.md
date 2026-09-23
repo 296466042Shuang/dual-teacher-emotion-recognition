@@ -2,43 +2,56 @@
 
 **Dual-teacher knowledge distillation for in-the-wild skeleton-based emotion recognition**
 
-Research code and project overview accompanying:
+Research project accompanying:
 
 **Shuang Wu and Daniela M. Romano**  
 *Privacy-preserving in-the-wild bodily expressed emotion recognition: A dual-teacher distillation framework with psychological priors*  
 **AI Open (2026)**  
 DOI: https://doi.org/10.1016/j.aiopen.2026.08.001
 
-> **Repository status:** the public research-code release is being cleaned and documented. This repository currently provides the project overview and will host the core modelling, inference, and reproducibility components.
+> **Public-code note:** this repository contains a compact reference implementation reconstructed around the published method and deployment interface. It is intended to communicate the modelling design clearly; it is **not** the exact internal training code used to produce the paper's reported benchmark numbers. Dataset-specific preprocessing, trained weights, private experiment orchestration, and some research artefacts are not released here.
 
 ## Overview
 
 Skeleton-based affect recognition provides a privacy-conscious alternative to appearance-heavy RGB pipelines, but real-world deployment remains difficult because 2D pose observations can be noisy, incomplete, viewpoint-dependent, and affected by occlusion.
 
-This project studies how richer training-time information can be transferred into a deployable model operating on lightweight body-motion representations. The framework combines complementary teacher signals, psychologically informed motion features, and knowledge distillation.
+DT-KD uses complementary training-time supervision to narrow this lab-to-field gap:
+
+1. a **privileged 3D teacher** for cleaner kinematic guidance;
+2. a **modality-aligned 2D teacher** closer to the deployment domain;
+3. a compact **2D + 33-D LMA student** retained at inference.
+
+The public reference code also illustrates sample-wise entropy routing between teachers, fine/coarse prediction heads corresponding to the psychology-grounded 7→26 structure, feature alignment, and optional prototype regularisation.
 
 A broader research question behind this work is:
 
 > **Which latent information remains recoverable when sensing observations are noisy, incomplete, or constrained by privacy requirements?**
 
-## Method
+## Public reference implementation
 
-The framework contains three main components:
+The repository intentionally exposes the core research interface rather than the complete experimental stack.
 
-1. **Privileged 3D teacher** — learns from richer 3D body-motion information and provides structured supervision unavailable at deployment time.
-2. **Modality-aligned 2D teacher** — provides supervision closer to the deployment setting and helps reduce the gap between privileged training information and noisy 2D observations.
-3. **Deployable student** — learns from complementary teacher signals and is designed for inference using privacy-preserving pose-derived representations.
+### Included
 
-Psychologically informed motion descriptors, including Laban Movement Analysis (LMA)-related features, are incorporated as interpretable affective priors.
+- PyTorch temporal pose encoder for 2D/3D skeleton sequences.
+- Privileged 3D teacher.
+- Modality-aligned 2D teacher.
+- Compact deployment-time student.
+- 33-D LMA feature interface.
+- Sample-wise entropy routing.
+- Multi-label knowledge-distillation loss.
+- Coarse 7-way and fine 26-way prediction heads.
+- Lightweight feature-alignment and prototype-loss hooks.
+- Synthetic inference and one-step training smoke tests.
 
-## Research highlights
+### Not included
 
-- Dual-teacher knowledge distillation with complementary privileged and deployment-aligned supervision.
-- Temporal modelling of human body motion rather than static appearance alone.
-- Privacy-conscious inference based on pose-derived representations.
-- Robustness-oriented learning under noisy and incomplete observations.
-- Psychologically informed motion representations using LMA/VAD-related priors.
-- Deployment-aware design: richer information can be used during training without requiring it at inference.
+- Raw BoLD, EMOTIC, or other restricted datasets.
+- Dataset-specific research preprocessing pipelines.
+- Trained checkpoints used for the paper.
+- Exact paper-specific LMA/VAD prototype values.
+- Full experiment orchestration and ablation infrastructure.
+- Private paths, cluster scripts, or internal research utilities.
 
 ## Repository structure
 
@@ -46,20 +59,29 @@ Psychologically informed motion descriptors, including Laban Movement Analysis (
 .
 ├── assets/
 ├── configs/
+│   └── example.yaml
 ├── demo/
+│   └── inference_demo.py
 ├── examples/
 ├── src/
 │   ├── datasets/
 │   ├── features/
+│   │   └── lma.py
 │   ├── models/
+│   │   ├── common.py
+│   │   ├── distillation.py
+│   │   ├── student.py
+│   │   └── teachers.py
 │   └── utils/
+│       └── metrics.py
+├── train_reference.py
 ├── requirements.txt
 └── README.md
 ```
 
 ## Installation
 
-The cleaned implementation is being prepared for public release. The intended environment is Python 3.10+ with PyTorch.
+Python 3.10+ and PyTorch are recommended.
 
 ```bash
 git clone https://github.com/296466042Shuang/dual-teacher-emotion-recognition.git
@@ -67,15 +89,45 @@ cd dual-teacher-emotion-recognition
 pip install -r requirements.txt
 ```
 
+## Quick start
+
+Run the deployment-time student on synthetic 2D pose + 33-D LMA input:
+
+```bash
+python demo/inference_demo.py
+```
+
+Run a single synthetic DT-KD training step to inspect the teacher/student interfaces and composite objective:
+
+```bash
+python train_reference.py
+```
+
+These scripts are smoke tests for the public reference implementation and do not reproduce the paper's benchmark results.
+
+## Core model interface
+
+```python
+from src.models import StudentModel
+
+student = StudentModel(
+    num_joints=17,
+    lma_dim=33,
+    feature_dim=96,
+)
+
+output = student(pose_2d, lma_33d)
+fine_logits = output["logits_26"]
+coarse_logits = output["logits_7"]
+```
+
+At deployment, teacher networks and privileged 3D observations are not required.
+
 ## Data
 
 The original experiments use research datasets subject to their respective licences and access conditions. Raw datasets are therefore **not redistributed through this repository**.
 
-Small synthetic or non-sensitive examples may be included to demonstrate expected input formats without exposing identifiable imagery or restricted data.
-
-## Reproducibility
-
-The public release will focus on the core modelling and inference components needed to understand the dual-teacher framework. Dataset-specific preprocessing and experiment paths will be documented separately where redistribution is permitted.
+Only synthetic or non-sensitive examples are used in the public smoke tests.
 
 ## Citation
 
@@ -84,6 +136,8 @@ The public release will focus on the core modelling and inference components nee
   title={Privacy-preserving in-the-wild bodily expressed emotion recognition: A dual-teacher distillation framework with psychological priors},
   author={Wu, Shuang and Romano, Daniela M.},
   journal={AI Open},
+  volume={7},
+  pages={248--275},
   year={2026},
   doi={10.1016/j.aiopen.2026.08.001}
 }
@@ -100,4 +154,4 @@ This project sits within broader work on temporal human-behaviour modelling, pri
 
 ## Licence
 
-Licence information will be added after the cleaned public code release is finalised and third-party code/data dependencies have been checked.
+No blanket software licence is granted yet. A licence will be added after the public release has been checked for third-party code and data dependencies.
